@@ -1,9 +1,7 @@
-package williewillus.BugfixMod;
+package pl.asie.foamfix.bugfixmod;
 
-/**
- * Created by Vincent on 3/10/14.
- */
 public class BugfixModSettings {
+    // Coremod
     public boolean SnowballFixEnabled;
     public boolean ChickenLureTweakEnabled;
     public boolean VillageAnvilTweakEnabled;
@@ -12,4 +10,11 @@ public class BugfixModSettings {
     public boolean ItemStairBounceFixEnabled;
     public boolean HeartBlinkFixEnabled;
     public boolean BoatDesyncFixEnabled;
+
+    // Mod
+    public boolean ArrowDingTweakEnabled;
+    public boolean ToolDesyncFixEnabled;
+
+    // Ghostbuster
+    public boolean gbEnableDebugger;
 }

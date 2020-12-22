@@ -1,10 +1,10 @@
-package williewillus.BugfixMod.coremod.patchers;
+package pl.asie.foamfix.bugfixmod.coremod.patchers;
 
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.MethodInsnNode;
-import williewillus.BugfixMod.coremod.MappingRegistry;
+import pl.asie.foamfix.bugfixmod.coremod.MappingRegistry;
 
 import java.util.Iterator;
 
@@ -26,7 +26,7 @@ public class ItemHopperBounceFixPatcher extends AbstractPatcher implements Modif
     @Override
     public void modifyInsns(AbstractInsnNode currentInstruction, Iterator<AbstractInsnNode> instructionSet, InsnList instructions) {
         if (currentInstruction instanceof MethodInsnNode && currentInstruction.getOpcode() == Opcodes.INVOKEVIRTUAL) {
-            String sbbMethodName = MappingRegistry.getMethodNameFor("BlockHopper.setBlockBounds");
+            String sbbMethodName = "BlockHopper.setBlockBounds";
 
             if (((MethodInsnNode) currentInstruction).name.equals(sbbMethodName)) {
                 if (currentInstruction.getPrevious().getOpcode() == Opcodes.FCONST_1           // Much tedium, very dirty

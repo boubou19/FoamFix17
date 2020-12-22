@@ -1,8 +1,8 @@
-package williewillus.BugfixMod.coremod.patchers;
+package pl.asie.foamfix.bugfixmod.coremod.patchers;
 
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.*;
-import williewillus.BugfixMod.coremod.MappingRegistry;
+import pl.asie.foamfix.bugfixmod.coremod.MappingRegistry;
 
 import java.util.Iterator;
 
@@ -19,28 +19,29 @@ public class ChickenLureTweakPatcher extends AbstractPatcher {
 
     @Override
     public InsnList buildNewInsns(AbstractInsnNode currentInstruction, Iterator<AbstractInsnNode> instructionSet) {
-        InsnList toInject = new InsnList();
         if (currentInstruction instanceof MethodInsnNode) {
 
             MethodInsnNode currentMIN = (MethodInsnNode) currentInstruction;
 
             if (currentMIN.getOpcode() == Opcodes.INVOKESPECIAL && currentMIN.getNext().getOpcode() == Opcodes.INVOKEVIRTUAL) {
-                String innerTargetOwner = MappingRegistry.getClassNameFor("net/minecraft/entity/ai/EntityAITempt");
+                String innerTargetOwner = ("net/minecraft/entity/ai/EntityAITempt");
 
                 if (currentMIN.owner.equals(innerTargetOwner)) {
                     printMessage("Found entry point");
-                    String chickenName = MappingRegistry.getClassNameFor("net/minecraft/entity/passive/EntityChicken");
+                    String chickenName = ("net/minecraft/entity/passive/EntityChicken");
                     String chickenTasks = MappingRegistry.getFieldNameFor("EntityChicken.tasks");
-                    String aiTaskName = MappingRegistry.getClassNameFor("net/minecraft/entity/ai/EntityAITasks");
+                    String aiTaskName = ("net/minecraft/entity/ai/EntityAITasks");
                     String aiTaskAdd = MappingRegistry.getMethodNameFor("EntityAITasks.addTask");
-                    String aiTemptName = MappingRegistry.getClassNameFor("net/minecraft/entity/ai/EntityAITempt");
-                    String aiBaseName = MappingRegistry.getClassNameFor("net/minecraft/entity/ai/EntityAIBase");
-                    String creatureName = MappingRegistry.getClassNameFor("net/minecraft/entity/EntityCreature");
-                    String initItemName = MappingRegistry.getClassNameFor("net/minecraft/init/Items");
-                    String itemName = MappingRegistry.getClassNameFor("net/minecraft/item/Item");
+                    String aiTemptName = ("net/minecraft/entity/ai/EntityAITempt");
+                    String aiBaseName = ("net/minecraft/entity/ai/EntityAIBase");
+                    String creatureName = ("net/minecraft/entity/EntityCreature");
+                    String initItemName = ("net/minecraft/init/Items");
+                    String itemName = ("net/minecraft/item/Item");
                     String melonName = MappingRegistry.getFieldNameFor("Items.melon_seeds");
                     String pumpkinName = MappingRegistry.getFieldNameFor("Items.pumpkin_seeds");
                     String wartName = MappingRegistry.getFieldNameFor("Items.nether_wart");
+
+                    InsnList toInject = new InsnList();
 
                     //Melon seeds
                     toInject.add(new VarInsnNode(Opcodes.ALOAD, 0));
@@ -85,6 +86,7 @@ public class ChickenLureTweakPatcher extends AbstractPatcher {
                 }
             }
         }
-        return toInject;
+
+        return null;
     }
 }

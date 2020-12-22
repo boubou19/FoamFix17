@@ -1,4 +1,4 @@
-package williewillus.BugfixMod.mod;
+package pl.asie.foamfix.bugfixmod.mod;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import net.minecraft.entity.monster.IMob;
@@ -10,7 +10,7 @@ import net.minecraftforge.event.entity.living.LivingHurtEvent;
 /**
  * Created by Vincent on 7/9/2015.
  */
-public class CommonEvents {
+public class ArrowDingTweakEventHandler {
     @SubscribeEvent
     public void mobDing(LivingHurtEvent evt) {
         if (evt.entityLiving instanceof IMob && "arrow".equals(evt.source.getDamageType())) {

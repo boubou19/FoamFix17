@@ -1,10 +1,10 @@
-package williewillus.BugfixMod.coremod.patchers;
+package pl.asie.foamfix.bugfixmod.coremod.patchers;
 
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.InsnList;
-import williewillus.BugfixMod.coremod.MappingRegistry;
+import pl.asie.foamfix.bugfixmod.coremod.MappingRegistry;
 
 import java.util.Iterator;
 
@@ -33,9 +33,9 @@ public class VillageAnvilTweakPatcher extends AbstractPatcher implements Modific
 
             if (f.name.equals(doubleSlabFieldName)) {
                 printMessage("Found entry point: " + f.owner + " " + f.name + " " + f.desc);
-                String blocksClassName = MappingRegistry.getClassNameFor("net/minecraft/init/Blocks");
+                String blocksClassName = ("net/minecraft/init/Blocks");
                 String anvilFieldName = MappingRegistry.getFieldNameFor("Blocks.anvil");
-                String blockClassName = MappingRegistry.getClassNameFor("net/minecraft/block/Block");
+                String blockClassName = ("net/minecraft/block/Block");
 
                 instructions.insert(currentInstruction, new FieldInsnNode(Opcodes.GETSTATIC,
                         blocksClassName,

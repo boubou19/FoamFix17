@@ -1,4 +1,4 @@
-package williewillus.BugfixMod.coremod.patchers;
+package pl.asie.foamfix.bugfixmod.coremod.patchers;
 
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
@@ -6,7 +6,7 @@ import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.MethodNode;
-import williewillus.BugfixMod.coremod.BugfixModClassTransformer;
+import pl.asie.foamfix.bugfixmod.coremod.BugfixModClassTransformer;
 
 import java.util.Iterator;
 
@@ -22,12 +22,16 @@ public abstract class AbstractPatcher {
 
     public AbstractPatcher(String name, String targetClassName, String targetMethodName, String targetMethodDesc) {
         this.patcherName = name;
-        this.targetClassName = targetClassName;
+        this.targetClassName = targetClassName.replace('/', '.');
         this.targetMethodName = targetMethodName;
         this.targetMethodDesc = targetMethodDesc;
     }
 
-    public byte[] patch(byte[] bytes) {
+    public byte[] patch(String transformedName, byte[] bytes) {
+        if (!targetClassName.equals(transformedName)) {
+            return bytes;
+        }
+
         ClassNode classNode = new ClassNode();
         ClassReader classReader = null;
         try {
@@ -37,32 +41,35 @@ public abstract class AbstractPatcher {
             return bytes;
         }
         classReader.accept(classNode, 0);
+        successful = false;
 
-        if (classNode.name.equals(targetClassName)) {
-            for (MethodNode method : classNode.methods) {
-                if (method.name.equals(targetMethodName) && method.desc.equals(targetMethodDesc)) {
-                    printMessage("Found target method");
-                    AbstractInsnNode currentInstruction;
-                    Iterator<AbstractInsnNode> instructionSet = method.instructions.iterator();
-                    while (instructionSet.hasNext()) {
-                        currentInstruction = instructionSet.next();
-                        if (this instanceof ModificationPatcher) {
-                            ((ModificationPatcher) this).modifyInsns(currentInstruction, instructionSet, method.instructions);
-                        } else {
-                            InsnList toInject = buildNewInsns(currentInstruction, instructionSet);
-                            if (toInject.size() > 0) {
-                                method.instructions.insert(currentInstruction, toInject);
-                            }
+        for (MethodNode method : classNode.methods) {
+            if (method.name.equals(targetMethodName) && (targetMethodDesc == null || method.desc.equals(targetMethodDesc))) {
+                printMessage("Found target method");
+                AbstractInsnNode currentInstruction;
+                Iterator<AbstractInsnNode> instructionSet = method.instructions.iterator();
+                while (instructionSet.hasNext()) {
+                    currentInstruction = instructionSet.next();
+                    if (this instanceof ModificationPatcher) {
+                        ((ModificationPatcher) this).modifyInsns(currentInstruction, instructionSet, method.instructions);
+                    } else {
+                        InsnList toInject = buildNewInsns(currentInstruction, instructionSet);
+                        if (toInject != null && toInject.size() > 0) {
+                            method.instructions.insert(currentInstruction, toInject);
                         }
                     }
                 }
             }
+        }
+
+        if (!successful) {
+            printMessage("Failed to apply transform!");
+            return bytes;
+        } else {
             ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_MAXS);
             classNode.accept(writer);
             printMessage(successful ? "Applied transform!" : "Failed to apply transform!");
             return writer.toByteArray();
-        } else {
-            return bytes;
         }
     }
 

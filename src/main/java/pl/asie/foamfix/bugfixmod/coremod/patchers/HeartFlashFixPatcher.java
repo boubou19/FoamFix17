@@ -1,8 +1,8 @@
-package williewillus.BugfixMod.coremod.patchers;
+package pl.asie.foamfix.bugfixmod.coremod.patchers;
 
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.*;
-import williewillus.BugfixMod.coremod.MappingRegistry;
+import pl.asie.foamfix.bugfixmod.coremod.MappingRegistry;
 
 import java.util.Iterator;
 
@@ -19,13 +19,13 @@ public class HeartFlashFixPatcher extends AbstractPatcher {
 
     @Override
     public InsnList buildNewInsns(AbstractInsnNode currentInstruction, Iterator<AbstractInsnNode> instructionSet) {
-        InsnList toInject = new InsnList();
         if (currentInstruction.getOpcode() == Opcodes.ICONST_0) {
             printMessage("Found entry point");
-            String ecpmpClassName = MappingRegistry.getClassNameFor("net/minecraft/client/entity/EntityClientPlayerMP");
+            String ecpmpClassName = "net/minecraft/client/entity/EntityClientPlayerMP";
             String getHealthMethodName = MappingRegistry.getMethodNameFor("EntityClientPlayerMP.getHealth");
             String prevHealthFieldName = MappingRegistry.getFieldNameFor("EntityClientPlayerMP.prevHealth");
 
+            InsnList toInject = new InsnList();
             toInject.add(new VarInsnNode(Opcodes.ALOAD, 0));
             toInject.add(new VarInsnNode(Opcodes.ALOAD, 0));
             toInject.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL,
@@ -39,7 +39,8 @@ public class HeartFlashFixPatcher extends AbstractPatcher {
                     prevHealthFieldName,
                     "F"));
             successful = true;
+            return toInject;
         }
-        return toInject;
+        return null;
     }
 }

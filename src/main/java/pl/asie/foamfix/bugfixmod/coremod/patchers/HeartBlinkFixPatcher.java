@@ -1,4 +1,4 @@
-package williewillus.BugfixMod.coremod.patchers;
+package pl.asie.foamfix.bugfixmod.coremod.patchers;
 
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.AbstractInsnNode;
@@ -19,15 +19,16 @@ public class HeartBlinkFixPatcher extends AbstractPatcher {
 
     @Override
     public InsnList buildNewInsns(AbstractInsnNode currentInstruction, Iterator<AbstractInsnNode> instructionSet) {
-        InsnList toInject = new InsnList();
 
         if (currentInstruction.getOpcode() == Opcodes.IDIV && currentInstruction.getPrevious().getOpcode() == Opcodes.ICONST_2) {
             printMessage("Found entry point");
+            InsnList toInject = new InsnList();
             toInject.add(new InsnNode(Opcodes.ICONST_1));
             toInject.add(new InsnNode(Opcodes.IADD));
             successful = true;
+            return toInject;
         }
 
-        return toInject;
+        return null;
     }
 }
