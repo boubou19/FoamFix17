@@ -38,7 +38,7 @@ idea {
 
 group = config.group_name
 version = config.mod_version
-archivesBaseName = "[${config.minecraft_version}]${config.mod_id}"
+archivesBaseName = "${config.mod_id}-${config.minecraft_version}"
 
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
@@ -80,6 +80,7 @@ jar {
     appendix = 'universal'
     manifest {
         attributes 'FMLCorePlugin': 'pl.asie.foamfix.coremod.FoamFixCore'
+        attributes 'FMLCorePluginContainsFMLMod': 'true'
     }
 }
 

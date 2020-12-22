@@ -70,8 +70,14 @@ public class MappingRegistry {
                     methodMap.put("ChunkProviderServer.provideChunk", "func_73154_d");
                 }
 
+                if (settings.gbFixFluidsVanilla) {
+                    methodMap.put("BlockStaticLiquid.isFlammable", "func_149817_o");
+                }
+
                 // ghost buster - general
                 methodMap.put("Block.updateTick", "func_149674_a");
+                methodMap.put("IBlockAccess.getBlock", "func_147439_a");
+                methodMap.put("IBlockAccess.isAirBlock", "func_147437_c");
             }
             hasInit = true;
         }

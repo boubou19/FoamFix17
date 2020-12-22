@@ -20,4 +20,6 @@ public class BugfixModSettings {
     public boolean gbEnableFixes;
     public boolean gbFixGrassVanilla;
     public boolean gbFixGrassBOP;
+    public boolean gbFixFluidsVanilla;
+    public boolean gbFixFluidsModded;
 }

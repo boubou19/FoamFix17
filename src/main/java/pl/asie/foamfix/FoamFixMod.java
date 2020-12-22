@@ -12,7 +12,7 @@ import pl.asie.foamfix.bugfixmod.mod.ToolDesyncFixEventHandler;
 import pl.asie.foamfix.bugfixmod.mod.ArrowDingTweakEventHandler;
 import pl.asie.foamfix.ghostbuster.CommandGhostBuster;
 
-@Mod(name = "FoamFix", modid = "foamfix", version = "@VERSION@")
+@Mod(name = "FoamFix", modid = "foamfix", version = "@VERSION@", acceptableRemoteVersions="*")
 public class FoamFixMod {
     @Mod.Instance
     public static FoamFixMod instance;

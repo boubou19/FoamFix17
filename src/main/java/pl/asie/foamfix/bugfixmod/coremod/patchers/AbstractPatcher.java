@@ -50,16 +50,20 @@ public abstract class AbstractPatcher {
         for (MethodNode method : classNode.methods) {
             if (method.name.equals(targetMethodName) && (targetMethodDesc == null || method.desc.equals(targetMethodDesc))) {
                 printMessage("Found target method");
-                AbstractInsnNode currentInstruction;
-                Iterator<AbstractInsnNode> instructionSet = method.instructions.iterator();
-                while (instructionSet.hasNext()) {
-                    currentInstruction = instructionSet.next();
-                    if (this instanceof ModificationPatcher) {
-                        ((ModificationPatcher) this).modifyInsns(currentInstruction, instructionSet, method.instructions);
-                    } else {
-                        InsnList toInject = buildNewInsns(currentInstruction, instructionSet);
-                        if (toInject != null && toInject.size() > 0) {
-                            method.instructions.insert(currentInstruction, toInject);
+                if (this instanceof GlobalModificationPatcher) {
+                    ((GlobalModificationPatcher) this).modifyInsnsGlobal(method.instructions);
+                } else {
+                    AbstractInsnNode currentInstruction;
+                    Iterator<AbstractInsnNode> instructionSet = method.instructions.iterator();
+                    while (instructionSet.hasNext()) {
+                        currentInstruction = instructionSet.next();
+                        if (this instanceof ModificationPatcher) {
+                            ((ModificationPatcher) this).modifyInsns(currentInstruction, instructionSet, method.instructions);
+                        } else {
+                            InsnList toInject = buildNewInsns(currentInstruction, instructionSet);
+                            if (toInject != null && toInject.size() > 0) {
+                                method.instructions.insert(currentInstruction, toInject);
+                            }
                         }
                     }
                 }

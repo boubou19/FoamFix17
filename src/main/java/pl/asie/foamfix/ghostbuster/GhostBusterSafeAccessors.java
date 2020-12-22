@@ -49,4 +49,12 @@ public class GhostBusterSafeAccessors {
 			return true;
 		}
 	}
+
+	public static Block getBlock(IBlockAccess access, int x, int y, int z) {
+		return isBlockLoaded(access, x, y, z) ? access.getBlock(x, y, z) : Blocks.air;
+	}
+
+	public static boolean isAirBlock(IBlockAccess access, int x, int y, int z) {
+		return !isBlockLoaded(access, x, y, z) || access.isAirBlock(x, y, z);
+	}
 }

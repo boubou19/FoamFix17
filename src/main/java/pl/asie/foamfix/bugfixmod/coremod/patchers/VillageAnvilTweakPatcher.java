@@ -21,9 +21,8 @@ public class VillageAnvilTweakPatcher extends AbstractPatcher implements Modific
 
     @Override
     public InsnList buildNewInsns(AbstractInsnNode currentInstruction, Iterator<AbstractInsnNode> instructionSet) {
-        return new InsnList();
+        return null;
     }
-
 
     @Override
     public void modifyInsns(AbstractInsnNode currentInstruction, Iterator<AbstractInsnNode> instructionSet, InsnList instructions) {

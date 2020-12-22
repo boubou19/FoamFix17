@@ -11,7 +11,7 @@ import java.util.Iterator;
  *
  * This fix makes projectiles knockback players again by removing a catch check for 0 damage events
  */
-public class SnowballFixPatcher extends AbstractPatcher implements ModificationPatcher {
+public class SnowballFixPatcher extends AbstractPatcher implements GlobalModificationPatcher {
 
     public SnowballFixPatcher(String name, String targetClassName, String targetMethodName, String targetMethodDesc) {
         super(name, targetClassName, targetMethodName, targetMethodDesc);
@@ -19,11 +19,11 @@ public class SnowballFixPatcher extends AbstractPatcher implements ModificationP
 
     @Override
     public InsnList buildNewInsns(AbstractInsnNode currentInstruction, Iterator<AbstractInsnNode> instructionSet) {
-        return new InsnList();
+        return null;
     }
 
     @Override
-    public void modifyInsns(AbstractInsnNode currentInstruction, Iterator<AbstractInsnNode> instructionSet, InsnList instructions) {
+    public void modifyInsnsGlobal(InsnList instructions) {
         for (int i = 0; i < instructions.size(); i++) {
             if (instructions.get(i).getOpcode() == Opcodes.IFNE && instructions.get(i).getPrevious().getOpcode() == Opcodes.FCMPL) {
                 if (instructions.get(i + 3).getOpcode() == Opcodes.ICONST_0) {

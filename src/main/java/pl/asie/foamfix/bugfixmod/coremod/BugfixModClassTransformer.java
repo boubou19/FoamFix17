@@ -17,11 +17,13 @@ import pl.asie.foamfix.bugfixmod.coremod.patchers.HeartFlashFixPatcher;
 import pl.asie.foamfix.bugfixmod.coremod.patchers.ItemHopperBounceFixPatcher;
 import pl.asie.foamfix.bugfixmod.coremod.patchers.ItemStairBounceFixPatcher;
 import pl.asie.foamfix.bugfixmod.coremod.patchers.VillageAnvilTweakPatcher;
+import pl.asie.foamfix.coremod.patchers.GhostBusterWrapperPatcher;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -34,7 +36,7 @@ public class BugfixModClassTransformer implements IClassTransformer {
     public File settingsFile;
     private boolean hasInit = false;
     public BugfixModSettings settings;
-    private Map<String, AbstractPatcher> patchers;
+    private Map<String, ArrayList<AbstractPatcher>> patchers;
     public Logger logger = LogManager.getLogger("foamfix");
 
     public BugfixModClassTransformer() {
@@ -59,6 +61,10 @@ public class BugfixModClassTransformer implements IClassTransformer {
                     "Fix ghost chunkloading caused by vanilla grass blocks.").getBoolean(true);
             settings.gbFixGrassBOP = config.get("ghostbuster", "fixGrassBop", true,
                     "Fix ghost chunkloading caused by Biomes O' Plenty grass blocks.").getBoolean(true);
+            settings.gbFixFluidsVanilla = config.get("ghostbuster", "fixFluidsVanilla", true,
+                    "Partially fix ghost chunkloading caused by vanilla fluid flow.").getBoolean(true);
+            settings.gbFixFluidsModded = config.get("ghostbuster", "fixFluidsModded", true,
+                    "Fix ghost chunkloading caused by modded fluid blocks.").getBoolean(true);
 
             settings.ItemHopperBounceFixEnabled = config.get("bugfixes", "itemBounceHopperFix", false,
                     "Fix items bouncing around on locked hoppers. (from BugfixMod by williewillus)"
@@ -110,9 +116,11 @@ public class BugfixModClassTransformer implements IClassTransformer {
 
     public byte[] transform(String name, String transformedName, byte[] bytes) {
         if (hasInit) {
-            AbstractPatcher p = patchers.get(transformedName);
-            if (p != null) {
-                bytes = p.patch(transformedName, bytes);
+            List<AbstractPatcher> pl = patchers.get(transformedName);
+            if (pl != null) {
+                for (AbstractPatcher p : pl) {
+                    bytes = p.patch(transformedName, bytes);
+                }
             }
         }
         return bytes;
@@ -242,11 +250,41 @@ public class BugfixModClassTransformer implements IClassTransformer {
                             "biomesoplenty/common/blocks/BlockBOPGrass", 3
                     ));
                 }
+
+                if (settings.gbFixFluidsVanilla) {
+                    addPatcher(new GhostBusterWrapperPatcher(
+                            "GhostBusterWrapStaticLiquid",
+                            "net/minecraft/block/BlockStaticLiquid",
+                            MappingRegistry.getMethodNameFor("Block.updateTick"),
+                            null
+                    ));
+                    addPatcher(new GhostBusterWrapperPatcher(
+                            "GhostBusterWrapStaticLiquid",
+                            "net/minecraft/block/BlockStaticLiquid",
+                            MappingRegistry.getMethodNameFor("BlockStaticLiquid.isFlammable"),
+                            null
+                    ));
+
+                    addPatcher(GhostBusterEarlyReturnPatcher.updateTick(
+                            "net/minecraft/block/BlockDynamicLiquid", 4 /* 1.7.10 max slope distance */
+                    ));
+                }
+
+                if (settings.gbFixFluidsModded) {
+                    addPatcher(GhostBusterEarlyReturnPatcher.updateTick(
+                            "net/minecraftforge/fluids/BlockFluidClassic", 4 /* recursionDepth limit */
+                    ));
+                    addPatcher(GhostBusterEarlyReturnPatcher.updateTick(
+                            "net/minecraftforge/fluids/BlockFluidFinite", 1
+                    ));
+                }
             }
         }
     }
 
     private void addPatcher(AbstractPatcher patcher) {
-        patchers.put(patcher.getTargetClassName(), patcher);
+        ArrayList<AbstractPatcher> list = patchers.computeIfAbsent(patcher.getTargetClassName(), k -> new ArrayList<>());
+        list.add(patcher);
+        list.trimToSize();
     }
 }

@@ -19,7 +19,7 @@ public class BoatDesyncFixPatcher_Main extends AbstractPatcher implements Modifi
 
     @Override
     public InsnList buildNewInsns(AbstractInsnNode currentInstruction, Iterator<AbstractInsnNode> instructionSet) {
-        return new InsnList();
+        return null;
     }
 
     @Override
