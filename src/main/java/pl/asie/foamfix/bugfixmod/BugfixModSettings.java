@@ -17,4 +17,7 @@ public class BugfixModSettings {
 
     // Ghostbuster
     public boolean gbEnableDebugger;
+    public boolean gbEnableFixes;
+    public boolean gbFixGrassVanilla;
+    public boolean gbFixGrassBOP;
 }

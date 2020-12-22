@@ -69,6 +69,9 @@ public class MappingRegistry {
                 if (settings.gbEnableDebugger) {
                     methodMap.put("ChunkProviderServer.provideChunk", "func_73154_d");
                 }
+
+                // ghost buster - general
+                methodMap.put("Block.updateTick", "func_149674_a");
             }
             hasInit = true;
         }

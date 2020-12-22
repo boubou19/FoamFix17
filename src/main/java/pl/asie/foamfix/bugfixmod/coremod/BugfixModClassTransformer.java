@@ -7,7 +7,8 @@ import org.apache.logging.log4j.Logger;
 import pl.asie.foamfix.bugfixmod.BugfixModSettings;
 import pl.asie.foamfix.bugfixmod.coremod.patchers.BoatDesyncFixPatcher_Extra;
 import pl.asie.foamfix.bugfixmod.coremod.patchers.ChickenLureTweakPatcher;
-import pl.asie.foamfix.bugfixmod.coremod.patchers.GhostBusterHookPatcher;
+import pl.asie.foamfix.coremod.patchers.GhostBusterEarlyReturnPatcher;
+import pl.asie.foamfix.coremod.patchers.GhostBusterHookPatcher;
 import pl.asie.foamfix.bugfixmod.coremod.patchers.HeartBlinkFixPatcher;
 import pl.asie.foamfix.bugfixmod.coremod.patchers.SnowballFixPatcher;
 import pl.asie.foamfix.bugfixmod.coremod.patchers.AbstractPatcher;
@@ -20,6 +21,8 @@ import pl.asie.foamfix.bugfixmod.coremod.patchers.VillageAnvilTweakPatcher;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -31,7 +34,7 @@ public class BugfixModClassTransformer implements IClassTransformer {
     public File settingsFile;
     private boolean hasInit = false;
     public BugfixModSettings settings;
-    private ArrayList<AbstractPatcher> patchers;
+    private Map<String, AbstractPatcher> patchers;
     public Logger logger = LogManager.getLogger("foamfix");
 
     public BugfixModClassTransformer() {
@@ -50,6 +53,12 @@ public class BugfixModClassTransformer implements IClassTransformer {
 
             settings.gbEnableDebugger = config.get("ghostbuster", "enableDebugger", false,
                     "Enable the /ghostbuster command used for logging ghost chunkloading events.").getBoolean(false);
+            settings.gbEnableFixes = config.get("ghostbuster", "enableFixes", true,
+                    "Main toggle. If disabled, none of the ghost chunkloading fixes are applied.").getBoolean(true);
+            settings.gbFixGrassVanilla = config.get("ghostbuster", "fixGrassVanilla", true,
+                    "Fix ghost chunkloading caused by vanilla grass blocks.").getBoolean(true);
+            settings.gbFixGrassBOP = config.get("ghostbuster", "fixGrassBop", true,
+                    "Fix ghost chunkloading caused by Biomes O' Plenty grass blocks.").getBoolean(true);
 
             settings.ItemHopperBounceFixEnabled = config.get("bugfixes", "itemBounceHopperFix", false,
                     "Fix items bouncing around on locked hoppers. (from BugfixMod by williewillus)"
@@ -101,7 +110,8 @@ public class BugfixModClassTransformer implements IClassTransformer {
 
     public byte[] transform(String name, String transformedName, byte[] bytes) {
         if (hasInit) {
-            for (AbstractPatcher p : patchers) {
+            AbstractPatcher p = patchers.get(transformedName);
+            if (p != null) {
                 bytes = p.patch(transformedName, bytes);
             }
         }
@@ -113,16 +123,16 @@ public class BugfixModClassTransformer implements IClassTransformer {
         if (patchers != null) {
             logger.warn("Patcher already initialized!!");
         } else {
-            patchers = new ArrayList<AbstractPatcher>();
+            patchers = new HashMap<>();
 
             if (settings.BoatDesyncFixEnabled) {
-                patchers.add(new BoatDesyncFixPatcher_Main(
+                addPatcher(new BoatDesyncFixPatcher_Main(
                     "BoatDesyncFix",
                     "net/minecraft/entity/item/EntityBoat",
                     MappingRegistry.getMethodNameFor("EntityBoat.setBoatIsEmpty"),
                     "(Z)V"
                 ));
-                patchers.add(new BoatDesyncFixPatcher_Extra(
+                addPatcher(new BoatDesyncFixPatcher_Extra(
                     "BoatDesyncFix|Extra",
                     "net/minecraft/entity/item/EntityBoat",
                     MappingRegistry.getMethodNameFor("EntityBoat.setPositionAndRotation2"),
@@ -131,7 +141,7 @@ public class BugfixModClassTransformer implements IClassTransformer {
             }
 
             if (settings.ChickenLureTweakEnabled) {
-                patchers.add(new ChickenLureTweakPatcher(
+                addPatcher(new ChickenLureTweakPatcher(
                         "ChickenLureTweak",
                         "net/minecraft/entity/passive/EntityChicken",
                         "<init>",
@@ -140,7 +150,7 @@ public class BugfixModClassTransformer implements IClassTransformer {
             }
 
             if (settings.HeartBlinkFixEnabled) {
-                patchers.add(new HeartBlinkFixPatcher(
+                addPatcher(new HeartBlinkFixPatcher(
                     "HeartBlinkFix",
                     "net/minecraft/client/entity/EntityPlayerSP",
                     MappingRegistry.getMethodNameFor("EntityPlayerSP.setPlayerSPHealth"),
@@ -149,7 +159,7 @@ public class BugfixModClassTransformer implements IClassTransformer {
             }
 
             if (settings.HeartFlashFixEnabled) {
-                patchers.add(new HeartFlashFixPatcher(
+                addPatcher(new HeartFlashFixPatcher(
                         "HeartFlashFix",
                         "net/minecraft/client/entity/EntityClientPlayerMP",
                         MappingRegistry.getMethodNameFor("EntityClientPlayerMP.attackEntityFrom"),
@@ -159,7 +169,7 @@ public class BugfixModClassTransformer implements IClassTransformer {
             }
 
             if (settings.HeartBlinkFixEnabled && settings.HeartFlashFixEnabled) {
-//                patchers.add(new HeartFlashFixCompatPatcher(
+//                addPatcher(new HeartFlashFixCompatPatcher(
 //                        "HeartFlashFix|Compat",
 //                        MappingRegistry.getClassNameFor("net/minecraft/client/entity/EntityClientPlayerMP"),
 //                        MappingRegistry.getMethodNameFor("EntityClientPlayerMP.setPlayerSPHealth"),
@@ -168,7 +178,7 @@ public class BugfixModClassTransformer implements IClassTransformer {
             }
 
             if (settings.ItemHopperBounceFixEnabled) {
-                patchers.add(new ItemHopperBounceFixPatcher(
+                addPatcher(new ItemHopperBounceFixPatcher(
                         "ItemHopperBounceFix",
                         "net/minecraft/block/BlockHopper",
                         MappingRegistry.getMethodNameFor("BlockHopper.addCollisionBoxesToList"),
@@ -179,7 +189,7 @@ public class BugfixModClassTransformer implements IClassTransformer {
             }
 
             if (settings.ItemStairBounceFixEnabled) {
-                patchers.add(new ItemStairBounceFixPatcher(
+                addPatcher(new ItemStairBounceFixPatcher(
                         "ItemStairBounceFix",
                         "net/minecraft/block/BlockStairs",
                         MappingRegistry.getMethodNameFor("BlockStairs.addCollisionBoxesToList"),
@@ -190,7 +200,7 @@ public class BugfixModClassTransformer implements IClassTransformer {
             }
 
             if (settings.SnowballFixEnabled) {
-                patchers.add(new SnowballFixPatcher(
+                addPatcher(new SnowballFixPatcher(
                         "SnowballFix",
                         "net/minecraft/entity/player/EntityPlayer",
                         MappingRegistry.getMethodNameFor("EntityPlayer.attackEntityFrom"),
@@ -203,7 +213,7 @@ public class BugfixModClassTransformer implements IClassTransformer {
                     + "Lnet/minecraft/world/gen/structure/StructureBoundingBox;)Z";
 
             if (settings.VillageAnvilTweakEnabled) {
-                patchers.add(new VillageAnvilTweakPatcher(
+                addPatcher(new VillageAnvilTweakPatcher(
                         "VillageAnvilTweak",
                         "net/minecraft/world/gen/structure/StructureVillagePieces$House2",
                         MappingRegistry.getMethodNameFor("StructureVillagePieces$House2.addComponentParts"),
@@ -212,13 +222,31 @@ public class BugfixModClassTransformer implements IClassTransformer {
             }
 
             if (settings.gbEnableDebugger) {
-                patchers.add(new GhostBusterHookPatcher(
+                addPatcher(new GhostBusterHookPatcher(
                         "GhostBusterHook",
                         "net/minecraft/world/gen/ChunkProviderServer",
                         MappingRegistry.getMethodNameFor("ChunkProviderServer.provideChunk"),
                         null
                 ));
             }
+
+            if (settings.gbEnableFixes) {
+                if (settings.gbFixGrassVanilla) {
+                    addPatcher(GhostBusterEarlyReturnPatcher.updateTick(
+                            "net/minecraft/block/BlockGrass", 3
+                    ));
+                }
+
+                if (settings.gbFixGrassBOP) {
+                    addPatcher(GhostBusterEarlyReturnPatcher.updateTick(
+                            "biomesoplenty/common/blocks/BlockBOPGrass", 3
+                    ));
+                }
+            }
         }
+    }
+
+    private void addPatcher(AbstractPatcher patcher) {
+        patchers.put(patcher.getTargetClassName(), patcher);
     }
 }

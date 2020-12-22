@@ -27,6 +27,10 @@ public abstract class AbstractPatcher {
         this.targetMethodDesc = targetMethodDesc;
     }
 
+    public String getTargetClassName() {
+        return targetClassName;
+    }
+
     public byte[] patch(String transformedName, byte[] bytes) {
         if (!targetClassName.equals(transformedName)) {
             return bytes;
@@ -75,7 +79,11 @@ public abstract class AbstractPatcher {
 
     public abstract InsnList buildNewInsns(AbstractInsnNode currentInstruction, Iterator<AbstractInsnNode> instructionSet);
 
+    public String getPatcherName() {
+        return patcherName;
+    }
+
     public void printMessage(String message) {
-        BugfixModClassTransformer.instance.logger.info("[" + patcherName + "] " + message);
+        BugfixModClassTransformer.instance.logger.info("[" + getPatcherName() + "] " + message);
     }
 }

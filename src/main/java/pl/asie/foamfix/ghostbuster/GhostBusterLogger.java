@@ -21,10 +21,9 @@ public class GhostBusterLogger {
 				int i = 0;
 				StackTraceElement[] stea = new Throwable().getStackTrace();
 
-				// TODO 1.12 -> 1.7.10
-				/* if (stea.length > 1 && stea[1].toString().startsWith("net.minecraft.server.management.PlayerChunkMapEntry")) {
+				if (stea.length > 3 && stea[3].toString().startsWith("net.minecraft.world.WorldServer.func_147456_g")) {
 					i = -1;
-				} */
+				}
 
 				if (i >= 0 && !countNotifyBlock) {
 					for (StackTraceElement ste : stea) {
@@ -38,13 +37,14 @@ public class GhostBusterLogger {
 				if (i >= 0) {
 					FoamFixMod.logger.info("Block in chunk [" + x + ", " + z + "] may be ghostloaded!");
 
+					// different hook method than 1.12 - skip provideChunk, we know as much
 					for (StackTraceElement ste : stea) {
 						try {
 							Class c = GhostBusterLogger.class.getClassLoader().loadClass(ste.getClassName());
 							if (MinecraftServer.class.isAssignableFrom(c)) {
 								break;
 							}
-							if ((i++) > 0) {
+							if ((i++) > 1) {
 								FoamFixMod.logger.info("- " + ste.toString());
 							}
 						} catch (Exception e) {
