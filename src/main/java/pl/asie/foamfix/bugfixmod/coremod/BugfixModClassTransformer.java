@@ -65,6 +65,8 @@ public class BugfixModClassTransformer implements IClassTransformer {
                     "Partially fix ghost chunkloading caused by vanilla fluid flow.").getBoolean(true);
             settings.gbFixFluidsModded = config.get("ghostbuster", "fixFluidsModded", true,
                     "Fix ghost chunkloading caused by modded fluid blocks.").getBoolean(true);
+            settings.gbFixVinesVanilla = config.get("ghostbuster", "fixVinesVanilla", true,
+                    "Fix ghost chunkloading caused by vanilla vine blocks.").getBoolean(true);
 
             settings.ItemHopperBounceFixEnabled = config.get("bugfixes", "itemBounceHopperFix", false,
                     "Fix items bouncing around on locked hoppers. (from BugfixMod by williewillus)"
@@ -276,6 +278,12 @@ public class BugfixModClassTransformer implements IClassTransformer {
                     ));
                     addPatcher(GhostBusterEarlyReturnPatcher.updateTick(
                             "net/minecraftforge/fluids/BlockFluidFinite", 1
+                    ));
+                }
+
+                if (settings.gbFixVinesVanilla) {
+                    addPatcher(GhostBusterEarlyReturnPatcher.updateTick(
+                            "net/minecraft/block/BlockVine", 4
                     ));
                 }
             }

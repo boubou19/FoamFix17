@@ -22,4 +22,5 @@ public class BugfixModSettings {
     public boolean gbFixGrassBOP;
     public boolean gbFixFluidsVanilla;
     public boolean gbFixFluidsModded;
+    public boolean gbFixVinesVanilla;
 }
