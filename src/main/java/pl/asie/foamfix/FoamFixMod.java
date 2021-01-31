@@ -28,6 +28,7 @@ import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
+import cpw.mods.fml.common.event.FMLServerStoppedEvent;
 import cpw.mods.fml.relauncher.Side;
 import net.minecraft.launchwrapper.Launch;
 import net.minecraftforge.common.MinecraftForge;
@@ -36,6 +37,7 @@ import pl.asie.foamfix.bugfixmod.coremod.BugfixModClassTransformer;
 import pl.asie.foamfix.bugfixmod.mod.ToolDesyncFixEventHandler;
 import pl.asie.foamfix.bugfixmod.mod.ArrowDingTweakEventHandler;
 import pl.asie.foamfix.ghostbuster.CommandGhostBuster;
+import pl.asie.foamfix.ghostbuster.GhostBusterLogger;
 
 import java.net.URLClassLoader;
 import java.util.Arrays;
@@ -87,5 +89,10 @@ public class FoamFixMod {
         if (BugfixModClassTransformer.instance.settings.gbEnableDebugger) {
             event.registerServerCommand(new CommandGhostBuster());
         }
+    }
+
+    @Mod.EventHandler
+    public void serverStopped(FMLServerStoppedEvent event) {
+        GhostBusterLogger.saveLogFile();
     }
 }

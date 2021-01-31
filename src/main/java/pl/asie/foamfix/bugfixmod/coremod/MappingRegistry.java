@@ -46,7 +46,7 @@ public class MappingRegistry {
 
                 if (settings.BoatDesyncFixEnabled) {
                     methodMap.put("EntityBoat.setPositionAndRotation2", "func_70056_a");
-                    methodMap.put("EntityBoat.setBoatIsEmpty", "func_70270_d")
+                    methodMap.put("EntityBoat.setIsBoatEmpty", "func_70270_d")
 ;
                 }
 

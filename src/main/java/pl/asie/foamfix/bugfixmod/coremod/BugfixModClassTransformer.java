@@ -77,6 +77,9 @@ public class BugfixModClassTransformer implements IClassTransformer {
 
             settings.gbEnableDebugger = config.get("ghostbuster", "enableDebugger", false,
                     "Enable the /ghostbuster command used for logging ghost chunkloading events.").getBoolean(false);
+            settings.gbDebuggerLogFilePath = config.get("ghostbuster", "debuggerLogFile", "",
+                    "Path of the log file for /ghostbuster logging; if empty, outputs to Minecraft log file.").getString().trim();
+            settings.gbDebuggerLogFile = settings.gbDebuggerLogFilePath.isEmpty() ? null : new File(settings.gbDebuggerLogFilePath);
             settings.gbEnableFixes = config.get("ghostbuster", "enableFixes", true,
                     "Main toggle. If disabled, none of the ghost chunkloading fixes are applied.").getBoolean(true);
             settings.gbFixGrassVanilla = config.get("ghostbuster", "fixGrassVanilla", true,
@@ -175,7 +178,7 @@ public class BugfixModClassTransformer implements IClassTransformer {
                 addPatcher(new BoatDesyncFixPatcher_Main(
                     "BoatDesyncFix",
                     "net/minecraft/entity/item/EntityBoat",
-                    MappingRegistry.getMethodNameFor("EntityBoat.setBoatIsEmpty"),
+                    MappingRegistry.getMethodNameFor("EntityBoat.setIsBoatEmpty"),
                     "(Z)V"
                 ));
                 addPatcher(new BoatDesyncFixPatcher_Extra(

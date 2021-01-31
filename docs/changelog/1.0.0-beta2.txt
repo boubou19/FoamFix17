@@ -1,5 +1,6 @@
 This release incorporates some backported FoamFix patches, as well as fixes from the Forkage project by immibis.
 
+* [#1] Added option to log /ghostbuster logging output to a separate log file.
 * Added code from FoamFix/1.12 to reduce the memory usage of the LaunchWrapper.
 * Added patch from Forkage to fix the issue of resuming non-paused sounds (f.e. when closing GUIs).
 * Added patch from Forkage to make items held by mobs reflect their NBT data.

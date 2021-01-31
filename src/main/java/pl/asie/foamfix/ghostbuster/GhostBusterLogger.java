@@ -28,10 +28,80 @@ import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.gen.ChunkProviderServer;
 import pl.asie.foamfix.FoamFixMod;
+import pl.asie.foamfix.bugfixmod.coremod.BugfixModClassTransformer;
+
+import java.io.*;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class GhostBusterLogger {
 	public static boolean debugChunkProviding = false;
 	public static boolean countNotifyBlock = false;
+	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	private static FileOutputStream fos;
+	private static OutputStreamWriter osw;
+	private static BufferedWriter bwr;
+
+	public static void saveLogFile() {
+		if (fos != null) {
+			try {
+				bwr.close();
+			} catch (IOException e) {
+				// pass
+			}
+			try {
+				osw.close();
+			} catch (IOException e) {
+				// pass
+			}
+			try {
+				fos.close();
+			} catch (IOException e) {
+				// pass
+			}
+			bwr = null;
+			osw = null;
+			fos = null;
+		}
+	}
+
+	private static void log(String s, boolean header) {
+		if (BugfixModClassTransformer.instance.settings.gbDebuggerLogFile == null) {
+			FoamFixMod.logger.info(s);
+		} else {
+			if (fos == null) {
+				try {
+					fos = new FileOutputStream(BugfixModClassTransformer.instance.settings.gbDebuggerLogFile, true);
+					osw = new OutputStreamWriter(fos);
+					bwr = new BufferedWriter(osw);
+
+					bwr.write(String.format("--- Started logging at %s ---%n", DATE_FORMAT.format(new Date())));
+				} catch (IOException e) {
+					throw new RuntimeException(e);
+				}
+			}
+
+			try {
+				if (header) {
+					bwr.write(String.format("[%s] %s%n", DATE_FORMAT.format(new Date()), s));
+				} else {
+					bwr.write(String.format("%s%n", s));
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	private static void logFlush() {
+		if (bwr != null) {
+			try {
+				bwr.flush();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
 
 	public static void onProvideChunk(ChunkProviderServer server, int x, int z) {
 		if (debugChunkProviding) {
@@ -58,7 +128,7 @@ public class GhostBusterLogger {
 				}
 
 				if (i >= 0) {
-					FoamFixMod.logger.info("Block in chunk [" + x + ", " + z + "] may be ghostloaded!");
+					log("Block in chunk [" + x + ", " + z + "] may be ghostloaded!", true);
 
 					// different hook method than 1.12 - skip provideChunk, we know as much
 					for (StackTraceElement ste : stea) {
@@ -68,12 +138,14 @@ public class GhostBusterLogger {
 								break;
 							}
 							if ((i++) > 1) {
-								FoamFixMod.logger.info("- " + ste.toString());
+								log("- " + ste.toString(), false);
 							}
 						} catch (Exception e) {
 
 						}
 					}
+
+					logFlush();
 				}
 			}
 		}

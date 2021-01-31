@@ -23,6 +23,8 @@
 
 package pl.asie.foamfix.bugfixmod;
 
+import java.io.File;
+
 public class BugfixModSettings {
     // Coremod
     public boolean SnowballFixEnabled;
@@ -47,6 +49,8 @@ public class BugfixModSettings {
     public boolean ToolDesyncFixEnabled;
 
     // Ghostbuster
+    public String gbDebuggerLogFilePath;
+    public File gbDebuggerLogFile;
     public boolean gbEnableDebugger;
     public boolean gbEnableFixes;
     public boolean gbFixGrassVanilla;
