@@ -1,0 +1,7 @@
+
+This is a bit unusual! Two things led to this:
+
+- FoamFix has recently (0.10.11) started covering not just optimizations, but bugfixes (missing ghost chunkloading patches),
+- BBoldt's Unabridged pack had to remove BugfixMod due to crashes related to block breaking.
+
+In essence, FoamFix for 1.7.10 is currently a combination of the ghost chunk loading patches and an updated, bugfixed and improved version of williewillus's old BugfixMod. I hope you'll enjoy it!

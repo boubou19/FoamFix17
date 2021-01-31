@@ -12,13 +12,18 @@ buildscript {
         maven {
             url = "https://jitpack.io"
         }
+        maven {
+            url = "https://plugins.gradle.org/m2/"
+        }
     }
     dependencies {
         classpath 'com.github.CDAGaming:ForgeGradle:1c670759c5'
+        classpath "gradle.plugin.net.minecrell:licenser:0.3"
     }
 }
 
 apply plugin: "forge"
+apply plugin: "net.minecrell.licenser"
 
 // define the properties file
 ext.configFile = file "build.properties"
@@ -72,6 +77,22 @@ processResources {
     from(sourceSets.main.resources.srcDirs) {
         exclude '**/*.info'
         exclude '**/*.properties'
+    }
+}
+
+license {
+    sourceSets = [project.sourceSets.main]
+    header = project.file("docs/LICENSE")
+    ignoreFailures = true
+    exclude '**/*.info'
+    exclude '**/*.mcmeta'
+}
+
+sourceSets {
+    main {
+        resources {
+            srcDirs += 'docs'
+        }
     }
 }
 
