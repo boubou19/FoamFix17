@@ -1,4 +1,3 @@
-
 This is a bit unusual! Two things led to this:
 
 - FoamFix has recently (0.10.11) started covering not just optimizations, but bugfixes (missing ghost chunkloading patches),

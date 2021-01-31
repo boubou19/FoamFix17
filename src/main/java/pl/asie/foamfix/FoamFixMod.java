@@ -25,15 +25,20 @@ package pl.asie.foamfix;
 
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
+import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.relauncher.Side;
+import net.minecraft.launchwrapper.Launch;
 import net.minecraftforge.common.MinecraftForge;
 import org.apache.logging.log4j.Logger;
 import pl.asie.foamfix.bugfixmod.coremod.BugfixModClassTransformer;
 import pl.asie.foamfix.bugfixmod.mod.ToolDesyncFixEventHandler;
 import pl.asie.foamfix.bugfixmod.mod.ArrowDingTweakEventHandler;
 import pl.asie.foamfix.ghostbuster.CommandGhostBuster;
+
+import java.net.URLClassLoader;
+import java.util.Arrays;
 
 @Mod(name = "FoamFix", modid = "foamfix", version = "@VERSION@", acceptableRemoteVersions="*")
 public class FoamFixMod {
@@ -45,6 +50,9 @@ public class FoamFixMod {
     @Mod.EventHandler
     public void preinit(FMLPreInitializationEvent evt) {
         logger = evt.getModLog();
+
+        System.out.println( System.getProperty("sun.boot.class.path"));
+        System.out.println(Arrays.toString(((URLClassLoader) ClassLoader.getSystemClassLoader()).getURLs()));
 
         if (BugfixModClassTransformer.instance.settings.ArrowDingTweakEnabled) {
             ArrowDingTweakEventHandler handler = new ArrowDingTweakEventHandler();
@@ -58,6 +66,19 @@ public class FoamFixMod {
                 FMLCommonHandler.instance().bus().register(handler);
                 MinecraftForge.EVENT_BUS.register(handler);
             }
+        }
+
+        if (BugfixModClassTransformer.instance.settings.lwRemovePackageManifestMap) {
+            logger.info("Removing LaunchWrapper package manifest map...");
+            LaunchWrapperRuntimeFix.removePackageManifestMap();
+        }
+    }
+
+    @Mod.EventHandler
+    public void init(FMLInitializationEvent evt) {
+        if (BugfixModClassTransformer.instance.settings.lwWeakenResourceCache) {
+            logger.info("Weakening LaunchWrapper resource cache...");
+            LaunchWrapperRuntimeFix.weakenResourceCache();
         }
     }
 

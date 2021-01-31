@@ -21,37 +21,22 @@
  * SOFTWARE.
  */
 
-package pl.asie.foamfix.bugfixmod;
+package pl.asie.foamfix.forkage.coremod.injects;
 
-public class BugfixModSettings {
-    // Coremod
-    public boolean SnowballFixEnabled;
-    public boolean ChickenLureTweakEnabled;
-    public boolean VillageAnvilTweakEnabled;
-    public boolean HeartFlashFixEnabled;
-    public boolean ItemHopperBounceFixEnabled;
-    public boolean ItemStairBounceFixEnabled;
-    public boolean HeartBlinkFixEnabled;
-    public boolean BoatDesyncFixEnabled;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.shader.TesselatorVertexState;
 
-    public boolean bfJarDiscovererMemoryLeakFixEnabled;
-    public boolean bfSoundSystemUnpauseFixEnabled;
-    public boolean bfEntityHeldItemNBTRenderFixEnabled;
-    public boolean bfAlphaPassTessellatorCrashFixEnabled;
+public class TessellatorAlphaPassWrapFixInject extends Tessellator {
+    @Override
+    public TesselatorVertexState getVertexState(float p_147564_1_, float p_147564_2_, float p_147564_3_) {
+        if (this.rawBufferIndex <= 0) {
+            return new TesselatorVertexState(new int[0], 0, this.vertexCount, this.hasTexture, this.hasBrightness, this.hasNormals, this.hasColor);
+        } else {
+            return getVertexState_foamfix_old(p_147564_1_, p_147564_2_, p_147564_3_);
+        }
+    }
 
-    public boolean lwWeakenResourceCache;
-    public boolean lwRemovePackageManifestMap;
-
-    // Mod
-    public boolean ArrowDingTweakEnabled;
-    public boolean ToolDesyncFixEnabled;
-
-    // Ghostbuster
-    public boolean gbEnableDebugger;
-    public boolean gbEnableFixes;
-    public boolean gbFixGrassVanilla;
-    public boolean gbFixGrassBOP;
-    public boolean gbFixFluidsVanilla;
-    public boolean gbFixFluidsModded;
-    public boolean gbFixVinesVanilla;
+    public TesselatorVertexState getVertexState_foamfix_old(float p_147564_1_, float p_147564_2_, float p_147564_3_) {
+        return null;
+    }
 }

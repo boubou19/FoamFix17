@@ -21,37 +21,49 @@
  * SOFTWARE.
  */
 
-package pl.asie.foamfix.bugfixmod;
+package pl.asie.foamfix.forkage.coremod.injects;
 
-public class BugfixModSettings {
-    // Coremod
-    public boolean SnowballFixEnabled;
-    public boolean ChickenLureTweakEnabled;
-    public boolean VillageAnvilTweakEnabled;
-    public boolean HeartFlashFixEnabled;
-    public boolean ItemHopperBounceFixEnabled;
-    public boolean ItemStairBounceFixEnabled;
-    public boolean HeartBlinkFixEnabled;
-    public boolean BoatDesyncFixEnabled;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.IIcon;
+import net.minecraft.world.World;
 
-    public boolean bfJarDiscovererMemoryLeakFixEnabled;
-    public boolean bfSoundSystemUnpauseFixEnabled;
-    public boolean bfEntityHeldItemNBTRenderFixEnabled;
-    public boolean bfAlphaPassTessellatorCrashFixEnabled;
+public class EntityLivingBaseItemNBTRenderFixInject extends EntityLivingBase {
+    public EntityLivingBaseItemNBTRenderFixInject(World p_i1594_1_) {
+        super(p_i1594_1_);
+    }
 
-    public boolean lwWeakenResourceCache;
-    public boolean lwRemovePackageManifestMap;
+    @Override
+    public ItemStack getHeldItem() {
+        return null;
+    }
 
-    // Mod
-    public boolean ArrowDingTweakEnabled;
-    public boolean ToolDesyncFixEnabled;
+    @Override
+    public ItemStack getEquipmentInSlot(int p_71124_1_) {
+        return null;
+    }
 
-    // Ghostbuster
-    public boolean gbEnableDebugger;
-    public boolean gbEnableFixes;
-    public boolean gbFixGrassVanilla;
-    public boolean gbFixGrassBOP;
-    public boolean gbFixFluidsVanilla;
-    public boolean gbFixFluidsModded;
-    public boolean gbFixVinesVanilla;
+    @Override
+    public void setCurrentItemOrArmor(int p_70062_1_, ItemStack p_70062_2_) {
+
+    }
+
+    @Override
+    public ItemStack[] getLastActiveItems() {
+        return new ItemStack[0];
+    }
+
+    @Override
+    public IIcon getItemIcon(ItemStack stack, int pass) {
+        try {
+            return stack.getItem().getIcon(stack, pass);
+        } catch (Throwable e) {
+            e.printStackTrace();
+            return getItemIcon_foamfix_old(stack, pass);
+        }
+    }
+
+    public IIcon getItemIcon_foamfix_old(ItemStack stack, int pass) {
+        return null;
+    }
 }

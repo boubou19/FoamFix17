@@ -1,0 +1,7 @@
+This release incorporates some backported FoamFix patches, as well as fixes from the Forkage project by immibis.
+
+* Added code from FoamFix/1.12 to reduce the memory usage of the LaunchWrapper.
+* Added patch from Forkage to fix the issue of resuming non-paused sounds (f.e. when closing GUIs).
+* Added patch from Forkage to make items held by mobs reflect their NBT data.
+* Added patch inspired by Forkage to fix a crash regarding empty alpha pass results from a chunk.
+* Added patch from Forkage to solve a native memory leak in FML's JarDiscoverer.

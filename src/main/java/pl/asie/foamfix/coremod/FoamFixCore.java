@@ -30,7 +30,7 @@ import pl.asie.foamfix.bugfixmod.coremod.BugfixModClassTransformer;
 import java.io.File;
 import java.util.Map;
 
-@IFMLLoadingPlugin.Name("Do not report to Forge! (If you haven't disabled the FoamFix coremod, try disabling it in the config! Note that this bit of text will still appear.)")
+@IFMLLoadingPlugin.Name("FoamFix/1.7 (Do not report to Forge!)")
 @IFMLLoadingPlugin.SortingIndex(1001)
 @IFMLLoadingPlugin.TransformerExclusions({"pl.asie.foamfix"})
 public class FoamFixCore implements IFMLLoadingPlugin, IFMLCallHook {

@@ -30,8 +30,7 @@ import org.apache.logging.log4j.Logger;
 import pl.asie.foamfix.bugfixmod.BugfixModSettings;
 import pl.asie.foamfix.bugfixmod.coremod.patchers.BoatDesyncFixPatcher_Extra;
 import pl.asie.foamfix.bugfixmod.coremod.patchers.ChickenLureTweakPatcher;
-import pl.asie.foamfix.coremod.patchers.GhostBusterEarlyReturnPatcher;
-import pl.asie.foamfix.coremod.patchers.GhostBusterHookPatcher;
+import pl.asie.foamfix.coremod.patchers.*;
 import pl.asie.foamfix.bugfixmod.coremod.patchers.HeartBlinkFixPatcher;
 import pl.asie.foamfix.bugfixmod.coremod.patchers.SnowballFixPatcher;
 import pl.asie.foamfix.bugfixmod.coremod.patchers.AbstractPatcher;
@@ -40,7 +39,7 @@ import pl.asie.foamfix.bugfixmod.coremod.patchers.HeartFlashFixPatcher;
 import pl.asie.foamfix.bugfixmod.coremod.patchers.ItemHopperBounceFixPatcher;
 import pl.asie.foamfix.bugfixmod.coremod.patchers.ItemStairBounceFixPatcher;
 import pl.asie.foamfix.bugfixmod.coremod.patchers.VillageAnvilTweakPatcher;
-import pl.asie.foamfix.coremod.patchers.GhostBusterWrapperPatcher;
+import pl.asie.foamfix.forkage.coremod.patchers.*;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -90,6 +89,20 @@ public class BugfixModClassTransformer implements IClassTransformer {
                     "Fix ghost chunkloading caused by modded fluid blocks.").getBoolean(true);
             settings.gbFixVinesVanilla = config.get("ghostbuster", "fixVinesVanilla", true,
                     "Fix ghost chunkloading caused by vanilla vine blocks.").getBoolean(true);
+
+            settings.bfJarDiscovererMemoryLeakFixEnabled = config.get("bugfixes", "jarDiscovererMemoryLeakFix", true,
+                    "Fix native memory leak in JarDiscoverer (from Forkage by immibis)").getBoolean(true);
+            settings.bfSoundSystemUnpauseFixEnabled = config.get("bugfixes", "soundSystemUnpauseFix", true,
+                    "Fix sounds playing extra times when you close a GUI or unpause the game (from Forkage by immibis)").getBoolean(true);
+            settings.bfEntityHeldItemNBTRenderFixEnabled = config.get("bugfixes", "entityHeldItemNBTRenderFix", true,
+                    "Fix items held by mobs not reflecting their NBT status (from Forkage by immibis)").getBoolean(true);
+            settings.bfAlphaPassTessellatorCrashFixEnabled = config.get("bugfixes", "tessellatorAlphaPassCrashFix", true,
+                    "Fix PriorityQueue tessellator crash on empty alpha pass.").getBoolean(true);
+
+            settings.lwWeakenResourceCache = config.get("launchwrapper", "weakenResourceCache", true,
+                    "Weaken LaunchWrapper's byte[] resource cache to make it cleanuppable by the GC. Safe.").getBoolean(true);
+            settings.lwRemovePackageManifestMap = config.get("launchwrapper", "removePackageManifestMap", true,
+                    "Remove LaunchWrapper package manifest map (which is not used anyway).").getBoolean(true);
 
             settings.ItemHopperBounceFixEnabled = config.get("bugfixes", "itemBounceHopperFix", false,
                     "Fix items bouncing around on locked hoppers. (from BugfixMod by williewillus)"
@@ -309,6 +322,36 @@ public class BugfixModClassTransformer implements IClassTransformer {
                             "net/minecraft/block/BlockVine", 4
                     ));
                 }
+            }
+
+            if (settings.bfJarDiscovererMemoryLeakFixEnabled) {
+                addPatcher(new JarDiscovererMemoryLeakFixPatcher(
+                        "JarDiscovererMemoryLeakFix",
+                        "cpw/mods/fml/common/discovery/JarDiscoverer",
+                        "discover",
+                        "(Lcpw/mods/fml/common/discovery/ModCandidate;Lcpw/mods/fml/common/discovery/ASMDataTable;)Ljava/util/List;"
+                ));
+            }
+
+            if (settings.bfSoundSystemUnpauseFixEnabled) {
+                addPatcher(new SoundSystemUnpauseFixPatcher(
+                        "SoundSystemUnpauseFix",
+                        "net/minecraft/client/audio/SoundManager"
+                ));
+            }
+
+            if (settings.bfEntityHeldItemNBTRenderFixEnabled) {
+                addPatcher(new EntityLivingBaseItemNBTRenderFixPatcher(
+                        "EntityHeldItemNBTRenderFix",
+                        "net/minecraft/entity/EntityLivingBase"
+                ));
+            }
+
+            if (settings.bfAlphaPassTessellatorCrashFixEnabled) {
+                addPatcher(new TessellatorAlphaPassWrapFixPatcher(
+                        "AlphaPassTessellatorCrashFix",
+                        "net/minecraft/client/renderer/Tessellator"
+                ));
             }
         }
     }

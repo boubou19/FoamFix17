@@ -21,37 +21,29 @@
  * SOFTWARE.
  */
 
-package pl.asie.foamfix.bugfixmod;
+package pl.asie.foamfix.forkage.coremod.patchers;
 
-public class BugfixModSettings {
-    // Coremod
-    public boolean SnowballFixEnabled;
-    public boolean ChickenLureTweakEnabled;
-    public boolean VillageAnvilTweakEnabled;
-    public boolean HeartFlashFixEnabled;
-    public boolean ItemHopperBounceFixEnabled;
-    public boolean ItemStairBounceFixEnabled;
-    public boolean HeartBlinkFixEnabled;
-    public boolean BoatDesyncFixEnabled;
+import org.objectweb.asm.tree.AbstractInsnNode;
+import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.tree.InsnList;
+import pl.asie.foamfix.bugfixmod.coremod.patchers.AbstractPatcher;
+import pl.asie.foamfix.coremod.util.ClassSplicingUtil;
 
-    public boolean bfJarDiscovererMemoryLeakFixEnabled;
-    public boolean bfSoundSystemUnpauseFixEnabled;
-    public boolean bfEntityHeldItemNBTRenderFixEnabled;
-    public boolean bfAlphaPassTessellatorCrashFixEnabled;
+import java.util.Iterator;
 
-    public boolean lwWeakenResourceCache;
-    public boolean lwRemovePackageManifestMap;
+public class EntityLivingBaseItemNBTRenderFixPatcher extends AbstractPatcher {
+    public EntityLivingBaseItemNBTRenderFixPatcher(String name, String targetClassName) {
+        super(name, targetClassName, "", "");
+    }
 
-    // Mod
-    public boolean ArrowDingTweakEnabled;
-    public boolean ToolDesyncFixEnabled;
+    @Override
+    public InsnList buildNewInsns(AbstractInsnNode currentInstruction, Iterator<AbstractInsnNode> instructionSet) {
+        return null;
+    }
 
-    // Ghostbuster
-    public boolean gbEnableDebugger;
-    public boolean gbEnableFixes;
-    public boolean gbFixGrassVanilla;
-    public boolean gbFixGrassBOP;
-    public boolean gbFixFluidsVanilla;
-    public boolean gbFixFluidsModded;
-    public boolean gbFixVinesVanilla;
+    @Override
+    protected void patchClassNode(ClassNode classNode) {
+        successful = ClassSplicingUtil.spliceClasses(classNode, "pl.asie.foamfix.forkage.coremod.injects.EntityLivingBaseItemNBTRenderFixInject", false,
+                "getItemIcon", "func_70620_b");
+    }
 }

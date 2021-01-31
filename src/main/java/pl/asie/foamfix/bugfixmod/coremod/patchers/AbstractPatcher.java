@@ -54,6 +54,35 @@ public abstract class AbstractPatcher {
         return targetClassName;
     }
 
+    protected void patchMethodNode(MethodNode method) {
+        if (this instanceof GlobalModificationPatcher) {
+            ((GlobalModificationPatcher) this).modifyInsnsGlobal(method.instructions);
+        } else {
+            AbstractInsnNode currentInstruction;
+            Iterator<AbstractInsnNode> instructionSet = method.instructions.iterator();
+            while (instructionSet.hasNext()) {
+                currentInstruction = instructionSet.next();
+                if (this instanceof ModificationPatcher) {
+                    ((ModificationPatcher) this).modifyInsns(currentInstruction, instructionSet, method.instructions);
+                } else {
+                    InsnList toInject = buildNewInsns(currentInstruction, instructionSet);
+                    if (toInject != null && toInject.size() > 0) {
+                        method.instructions.insert(currentInstruction, toInject);
+                    }
+                }
+            }
+        }
+    }
+
+    protected void patchClassNode(ClassNode classNode) {
+        for (MethodNode method : classNode.methods) {
+            if (method.name.equals(targetMethodName) && (targetMethodDesc == null || method.desc.equals(targetMethodDesc))) {
+                printMessage("Found target method");
+                patchMethodNode(method);
+            }
+        }
+    }
+
     public byte[] patch(String transformedName, byte[] bytes) {
         if (!targetClassName.equals(transformedName)) {
             return bytes;
@@ -70,28 +99,7 @@ public abstract class AbstractPatcher {
         classReader.accept(classNode, 0);
         successful = false;
 
-        for (MethodNode method : classNode.methods) {
-            if (method.name.equals(targetMethodName) && (targetMethodDesc == null || method.desc.equals(targetMethodDesc))) {
-                printMessage("Found target method");
-                if (this instanceof GlobalModificationPatcher) {
-                    ((GlobalModificationPatcher) this).modifyInsnsGlobal(method.instructions);
-                } else {
-                    AbstractInsnNode currentInstruction;
-                    Iterator<AbstractInsnNode> instructionSet = method.instructions.iterator();
-                    while (instructionSet.hasNext()) {
-                        currentInstruction = instructionSet.next();
-                        if (this instanceof ModificationPatcher) {
-                            ((ModificationPatcher) this).modifyInsns(currentInstruction, instructionSet, method.instructions);
-                        } else {
-                            InsnList toInject = buildNewInsns(currentInstruction, instructionSet);
-                            if (toInject != null && toInject.size() > 0) {
-                                method.instructions.insert(currentInstruction, toInject);
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        patchClassNode(classNode);
 
         if (!successful) {
             printMessage("Failed to apply transform!");
