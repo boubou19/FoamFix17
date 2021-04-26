@@ -105,6 +105,7 @@ public class GhostBusterLogger {
 
 	public static void onProvideChunk(ChunkProviderServer server, int x, int z) {
 		if (debugChunkProviding) {
+			int dim = server.worldObj.provider.dimensionId;
 			Chunk chunk = (Chunk) server.loadedChunkHashMap.getValueByKey(ChunkCoordIntPair.chunkXZ2Int(x, z));
 			if (chunk != null) {
 				return;
@@ -128,7 +129,7 @@ public class GhostBusterLogger {
 				}
 
 				if (i >= 0) {
-					log("Block in chunk [" + x + ", " + z + "] may be ghostloaded!", true);
+					log("Block in chunk [" + x + ", " + z + "] of dim "+Integer.toString(dim)+" may be ghostloaded!", true);
 
 					// different hook method than 1.12 - skip provideChunk, we know as much
 					for (StackTraceElement ste : stea) {
